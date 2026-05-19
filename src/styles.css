@@ -32,6 +32,7 @@ button {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr) 320px;
   min-height: 100vh;
+  max-height: 100vh;
 }
 
 .left-rail,
@@ -41,7 +42,35 @@ button {
     linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(7, 9, 12, 0.96)),
     #0d1117;
   padding: 22px;
-  overflow-y: auto;
+  overflow-y: scroll;
+  height: 100vh;
+  max-height: 100vh;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(53, 214, 255, 0.4) rgba(53, 214, 255, 0.1);
+}
+
+/* Webkit scrollbar styling (Chrome, Safari, Edge) */
+.left-rail::-webkit-scrollbar,
+.right-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.left-rail::-webkit-scrollbar-track,
+.right-panel::-webkit-scrollbar-track {
+  background: rgba(53, 214, 255, 0.08);
+  border-radius: 10px;
+}
+
+.left-rail::-webkit-scrollbar-thumb,
+.right-panel::-webkit-scrollbar-thumb {
+  background: rgba(53, 214, 255, 0.4);
+  border-radius: 10px;
+  border: 2px solid rgba(53, 214, 255, 0.08);
+}
+
+.left-rail::-webkit-scrollbar-thumb:hover,
+.right-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(53, 214, 255, 0.6);
 }
 
 .left-rail {
@@ -156,6 +185,28 @@ button {
 .mode-toggle button.active {
   color: #e0f2fe;
   background: rgba(53, 214, 255, 0.13);
+}
+
+.control-section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.control-section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.control-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: block;
 }
 
 .control {

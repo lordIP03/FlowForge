@@ -49,3 +49,7 @@ pnpm-debug.log*
 *~
 .*.swp
 .*.swo
+
+
+# roadmap
+roadmap.md

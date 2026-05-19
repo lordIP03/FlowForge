@@ -21,6 +21,9 @@ const initialSettings: FlowSettings = {
   wireframe: false,
   sectionCut: false,
   pressureMap: true,
+  modelRotationX: 0,
+  modelRotationY: 0,
+  modelRotationZ: 0,
 };
 
 export function App() {
@@ -113,16 +116,39 @@ export function App() {
             </button>
           </div>
 
-          <ControlSlider label="Flow speed" value={settings.flowSpeed} min={5} max={120} unit="m/s" onChange={(value) => updateSetting("flowSpeed", value)} />
-          <ControlSlider label="Angle of attack" value={settings.angleOfAttack} min={-18} max={18} unit="deg" onChange={(value) => updateSetting("angleOfAttack", value)} />
-          <ControlSlider label="Field density" value={settings.density} min={20} max={100} unit="%" onChange={(value) => updateSetting("density", value)} />
-          <ControlSlider label="Particles" value={settings.particleCount} min={300} max={3200} unit="" onChange={(value) => updateSetting("particleCount", value)} />
-          <ControlSlider label="Turbulence" value={settings.turbulence} min={0} max={100} unit="%" onChange={(value) => updateSetting("turbulence", value)} />
+          {/* FLOW SETTINGS */}
+          <div className="control-section">
+            <span className="control-section-title">Flow Settings</span>
+            <ControlSlider label="Flow speed" value={settings.flowSpeed} min={5} max={120} unit="m/s" onChange={(value) => updateSetting("flowSpeed", value)} />
+            <ControlSlider label="Angle of attack" value={settings.angleOfAttack} min={-18} max={18} unit="deg" onChange={(value) => updateSetting("angleOfAttack", value)} />
+          </div>
 
-          <div className="switch-grid">
-            <Toggle label="Wireframe" icon={<Layers3 size={16} />} checked={settings.wireframe} onChange={(value) => updateSetting("wireframe", value)} />
-            <Toggle label="Section" icon={<Box size={16} />} checked={settings.sectionCut} onChange={(value) => updateSetting("sectionCut", value)} />
-            <Toggle label="Pressure" icon={<Gauge size={16} />} checked={settings.pressureMap} onChange={(value) => updateSetting("pressureMap", value)} />
+          {/* MODEL ROTATION - Only show if custom model uploaded */}
+          {modelFile && (
+            <div className="control-section">
+              <span className="control-section-title">Model Rotation</span>
+              <ControlSlider label="Rotate X" value={settings.modelRotationX} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationX", value)} />
+              <ControlSlider label="Rotate Y" value={settings.modelRotationY} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationY", value)} />
+              <ControlSlider label="Rotate Z" value={settings.modelRotationZ} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationZ", value)} />
+            </div>
+          )}
+
+          {/* FIELD SETTINGS */}
+          <div className="control-section">
+            <span className="control-section-title">Field Settings</span>
+            <ControlSlider label="Field density" value={settings.density} min={20} max={100} unit="%" onChange={(value) => updateSetting("density", value)} />
+            <ControlSlider label="Particles" value={settings.particleCount} min={300} max={3200} unit="" onChange={(value) => updateSetting("particleCount", value)} />
+            <ControlSlider label="Turbulence" value={settings.turbulence} min={0} max={100} unit="%" onChange={(value) => updateSetting("turbulence", value)} />
+          </div>
+
+          {/* VISUALIZATION */}
+          <div className="control-section">
+            <span className="control-section-title">Visualization</span>
+            <div className="switch-grid">
+              <Toggle label="Wireframe" icon={<Layers3 size={16} />} checked={settings.wireframe} onChange={(value) => updateSetting("wireframe", value)} />
+              <Toggle label="Section" icon={<Box size={16} />} checked={settings.sectionCut} onChange={(value) => updateSetting("sectionCut", value)} />
+              <Toggle label="Pressure" icon={<Gauge size={16} />} checked={settings.pressureMap} onChange={(value) => updateSetting("pressureMap", value)} />
+            </div>
           </div>
         </aside>
 

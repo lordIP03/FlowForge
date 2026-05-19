@@ -14,6 +14,9 @@ export type FlowSettings = {
   wireframe: boolean;
   sectionCut: boolean;
   pressureMap: boolean;
+  modelRotationX: number;
+  modelRotationY: number;
+  modelRotationZ: number;
 };
 
 export type GeometryStats = {
@@ -37,6 +40,7 @@ type SceneBag = {
   streamlines: THREE.LineSegments;
   sectionPlane: THREE.Mesh;
   frameId: number;
+  modelRotation: { x: number; y: number; z: number };
 };
 
 export function FlowViewport({
@@ -57,7 +61,17 @@ export function FlowViewport({
     const bag = bagRef.current;
     if (!bag) return;
 
-    bag.modelGroup.rotation.z = THREE.MathUtils.degToRad(settings.angleOfAttack);
+    // Apply model rotations
+    bag.modelRotation.x = THREE.MathUtils.degToRad(settings.modelRotationX);
+    bag.modelRotation.y = THREE.MathUtils.degToRad(settings.modelRotationY);
+    bag.modelRotation.z = THREE.MathUtils.degToRad(settings.modelRotationZ + settings.angleOfAttack);
+
+    // Apply rotation to all children in modelGroup
+    bag.modelGroup.children.forEach((child) => {
+      child.rotation.order = "YXZ";
+      child.rotation.set(bag.modelRotation.x, bag.modelRotation.y, bag.modelRotation.z);
+    });
+
     bag.sectionPlane.visible = settings.sectionCut;
     bag.renderer.localClippingEnabled = settings.sectionCut;
     bag.particleSystem.material = createParticleMaterial(settings.fluidType);
@@ -114,6 +128,7 @@ export function FlowViewport({
       streamlines,
       sectionPlane,
       frameId: 0,
+      modelRotation: { x: 0, y: 0, z: 0 },
     };
     bagRef.current = bag;
 
@@ -361,17 +376,47 @@ function createSectionPlane() {
 }
 
 function normalizeObject(object: THREE.Object3D) {
+  // Calculate bounding box to get current size
   const box = new THREE.Box3().setFromObject(object);
   const size = new THREE.Vector3();
   box.getSize(size);
+  
+  // Find the longest dimension (likely flow direction)
   const maxAxis = Math.max(size.x, size.y, size.z) || 1;
+  
+  // Scale object to reasonable size (4.8 units max)
   object.scale.multiplyScalar(4.8 / maxAxis);
-
-  const normalizedBox = new THREE.Box3().setFromObject(object);
+  
+  // Recalculate box after scaling
+  const scaledBox = new THREE.Box3().setFromObject(object);
+  const scaledSize = new THREE.Vector3();
+  scaledBox.getSize(scaledSize);
+  
+  // Get center of scaled object
   const center = new THREE.Vector3();
-  normalizedBox.getCenter(center);
-  object.position.sub(center);
-  object.rotation.z = 0;
+  scaledBox.getCenter(center);
+  
+  // Move object to origin (center = 0,0,0)
+  object.position.copy(center).negate();
+  
+  // Ensure no default rotation interference
+  object.rotation.set(0, 0, 0);
+  
+  // Find which axis is longest and align to X (flow direction)
+  const axes = [
+    { axis: 'x', size: scaledSize.x },
+    { axis: 'y', size: scaledSize.y },
+    { axis: 'z', size: scaledSize.z },
+  ].sort((a, b) => b.size - a.size);
+  
+  const longestAxis = axes[0].axis;
+  
+  // Rotate to align longest axis with X (flow direction)
+  if (longestAxis === 'y') {
+    object.rotateZ(Math.PI / 2);
+  } else if (longestAxis === 'z') {
+    object.rotateY(Math.PI / 2);
+  }
 }
 
 function extractStats(object: THREE.Object3D, fileName: string): GeometryStats {
