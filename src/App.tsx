@@ -3,12 +3,12 @@ import { ChangeEvent, useMemo, useState } from "react";
 import { FlowViewport, FlowSettings, GeometryStats } from "./components/FlowViewport";
 
 const defaultStats: GeometryStats = {
-  fileName: "NACA concept wing",
-  vertices: 642,
-  faces: 1280,
-  bounds: "5.20 x 0.64 x 1.28 m",
-  volumeEstimate: "0.92 m3",
-  status: "Procedural preview",
+  fileName: "Koenigsegg.obj",
+  vertices: 0,
+  faces: 0,
+  bounds: "Loading…",
+  volumeEstimate: "—",
+  status: "Loading default model",
 };
 
 const initialSettings: FlowSettings = {
@@ -30,7 +30,7 @@ export function App() {
   const [settings, setSettings] = useState<FlowSettings>(initialSettings);
   const [modelFile, setModelFile] = useState<File | null>(null);
   const [stats, setStats] = useState<GeometryStats>(defaultStats);
-  const [uploadMessage, setUploadMessage] = useState("Drop STL or OBJ geometry to replace the reference wing.");
+  const [uploadMessage, setUploadMessage] = useState("Koenigsegg loaded as default model. Drop STL or OBJ to replace.");
 
   const metrics = useMemo(() => {
     const speedFactor = settings.flowSpeed / 50;
@@ -123,15 +123,13 @@ export function App() {
             <ControlSlider label="Angle of attack" value={settings.angleOfAttack} min={-18} max={18} unit="deg" onChange={(value) => updateSetting("angleOfAttack", value)} />
           </div>
 
-          {/* MODEL ROTATION - Only show if custom model uploaded */}
-          {modelFile && (
-            <div className="control-section">
-              <span className="control-section-title">Model Rotation</span>
-              <ControlSlider label="Rotate X" value={settings.modelRotationX} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationX", value)} />
-              <ControlSlider label="Rotate Y" value={settings.modelRotationY} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationY", value)} />
-              <ControlSlider label="Rotate Z" value={settings.modelRotationZ} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationZ", value)} />
-            </div>
-          )}
+          {/* MODEL ROTATION */}
+          <div className="control-section">
+            <span className="control-section-title">Model Rotation</span>
+            <ControlSlider label="Rotate X" value={settings.modelRotationX} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationX", value)} />
+            <ControlSlider label="Rotate Y" value={settings.modelRotationY} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationY", value)} />
+            <ControlSlider label="Rotate Z" value={settings.modelRotationZ} min={-180} max={180} unit="deg" onChange={(value) => updateSetting("modelRotationZ", value)} />
+          </div>
 
           {/* FIELD SETTINGS */}
           <div className="control-section">

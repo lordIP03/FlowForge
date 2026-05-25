@@ -55,6 +55,8 @@ export function FlowViewport({
   const hostRef = useRef<HTMLDivElement | null>(null);
   const bagRef = useRef<SceneBag | null>(null);
   const settingsRef = useRef(settings);
+  const onStatsRef = useRef(onStats);
+  useEffect(() => { onStatsRef.current = onStats; }, [onStats]);
 
   useEffect(() => {
     settingsRef.current = settings;
@@ -106,7 +108,21 @@ export function FlowViewport({
 
     const modelGroup = new THREE.Group();
     scene.add(modelGroup);
-    modelGroup.add(createReferenceWing(settings));
+
+    // Load the Koenigsegg OBJ as the default model
+    fetch("/Koenigsegg.obj")
+      .then((res) => res.text())
+      .then((text) => {
+        const object = new OBJLoader().parse(text);
+        refreshModelMaterials(object, settingsRef.current);
+        normalizeObject(object);
+        modelGroup.add(object);
+        onStatsRef.current(extractStats(object, "Koenigsegg.obj"));
+      })
+      .catch(() => {
+        // Fallback to procedural wing if fetch fails
+        modelGroup.add(createReferenceWing(settingsRef.current));
+      });
 
     addEnvironment(scene);
     const particleData = createParticles(settings.particleCount, settings.fluidType);
